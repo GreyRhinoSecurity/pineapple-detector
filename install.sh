@@ -7,8 +7,20 @@ DEST="$HOME/pineapple-detector"
 echo "🔽 Installing/updating Pineapple Chaser to $DEST …"
 
 if [[ -d "$DEST/.git" ]]; then
-  echo "➡️  Existing install detected. Pulling latest changes…"
-  git -C "$DEST" pull --rebase
+  # Clean working tree?
+  if git -C "$DEST" diff-index --quiet HEAD --; then
+    echo "➡️  Clean repo – pulling latest…"
+    git -C "$DEST" pull --rebase
+  else
+    echo "⚠️  Uncommitted changes detected – backing up and recloning"
+    mv "$DEST" "${DEST}.backup.$(date +%Y%m%d%H%M%S)"
+    git clone "$REPO" "$DEST"
+  fi
+
+elif [[ -d "$DEST" ]]; then
+  echo "⚠️  $DEST exists but isn’t a Git repo – backing up and cloning fresh"
+  mv "$DEST" "${DEST}.backup.$(date +%Y%m%d%H%M%S)"
+  git clone "$REPO" "$DEST"
 else
   echo "➡️  Cloning repository…"
   git clone "$REPO" "$DEST"
@@ -19,7 +31,7 @@ chmod +x "$DEST/pineapple-detector.sh"
 
 cat <<EOF
 
-✅ Pineapple Chaser installed at:
+✅ Pineapple Chaser is now at:
      $DEST/pineapple-detector.sh
 
 ▶️  To run:
