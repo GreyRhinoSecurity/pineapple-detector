@@ -267,10 +267,21 @@ HTML_ABS=$(realpath "$HTML")
 ln -sfn "$SESSION" "$DASHDIR/latest"
 
 ############################  MINI HTTP  ####################################
+#if (( POPUP )); then
+ # PORT=$(shuf -i 2000-65000 -n 1)
+  #cd "$DASHDIR" && python3 -m http.server "$PORT" >/dev/null 2>&1 &
+  #HTTP_PID=$!
+#fi
+
+#echo "Dashboard saved → $HTML_ABS"
+
+# Apply this patch in the MINI HTTP section:
 if (( POPUP )); then
   PORT=$(shuf -i 2000-65000 -n 1)
   cd "$DASHDIR" && python3 -m http.server "$PORT" >/dev/null 2>&1 &
   HTTP_PID=$!
-fi
 
-echo "Dashboard saved → $HTML_ABS"
+  # immediately open the dashboard in the browser:
+  HTML_ABS=$(realpath "$SESSION/dashboard.html")
+  open_dash
+fi
