@@ -1,14 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "[*] Installing Pineapple Detector..."
+REPO="https://github.com/GreyRhinoSecurity/pineapple-detector.git"
+DEST="$HOME/pineapple-detector"
 
-INSTALL_DIR="$HOME/.pineapple-detector"
-BIN_LINK="/usr/local/bin/pineapple-detector"
+echo "🔽 Installing/updating Pineapple Chaser to $DEST …"
 
-mkdir -p "$INSTALL_DIR"
-curl -sLo "$INSTALL_DIR/pineapple-detector.sh" "https://raw.githubusercontent.com/GreyRhinoSecurity/ChubbyCat-NG-Pineapple_Chasser/main/pineapple-detector.sh"
-chmod +x "$INSTALL_DIR/pineapple-detector.sh"
+if [[ -d "$DEST/.git" ]]; then
+  echo "➡️  Existing install detected. Pulling latest changes…"
+  git -C "$DEST" pull --rebase
+else
+  echo "➡️  Cloning repository…"
+  git clone "$REPO" "$DEST"
+fi
 
-sudo ln -sf "$INSTALL_DIR/pineapple-detector.sh" "$BIN_LINK"
+echo "🔧 Setting executable bit…"
+chmod +x "$DEST/pineapple-detector.sh"
 
-echo "[+] Installed! You can now run: pineapple-detector"
+cat <<EOF
+
+✅ Pineapple Chaser installed at:
+     $DEST/pineapple-detector.sh
+
+▶️  To run:
+     sudo $DEST/pineapple-detector.sh --interface wlan1
+
+(Optional) Add to your PATH:
+  ln -sfn "$DEST/pineapple-detector.sh" ~/.local/bin/pineapple-detector
+  echo 'export PATH=\$HOME/.local/bin:\$PATH' >> ~/.bashrc
+
+EOF
